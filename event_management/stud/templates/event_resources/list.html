@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}Event Resources{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>📦 Event Resources Management</h1>
+    <a href="{% url 'event_resource_create' %}" class="btn btn-primary">+ Add Event Resource</a>
+</div>
+
+<div class="card">
+    {% if event_resources %}
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Event</th>
+                    <th>Resource</th>
+                    <th>Quantity Required</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for er in event_resources %}
+                <tr>
+                    <td>{{ er.er_id }}</td>
+                    <td><strong>{{ er.event.title }}</strong></td>
+                    <td>{{ er.resource.resource_name }}</td>
+                    <td><span class="badge badge-warning">{{ er.quantity_required }} units</span></td>
+                    <td>
+                        <a href="{% url 'event_resource_delete' er.er_id %}" 
+                           class="btn btn-danger" 
+                           onclick="return confirmDelete('Delete this allocation?')">
+                            🗑️ Delete
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon">📦</div>
+            <p>No event resources allocated.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

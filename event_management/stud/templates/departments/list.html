@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block title %}Departments{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>🏢 Departments Management</h1>
+    <a href="{% url 'department_create' %}" class="btn btn-primary">+ Add New Department</a>
+</div>
+
+<div class="card">
+    {% if departments %}
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Department Name</th>
+                    <th>Code</th>
+                    <th>HOD Name</th>
+                    <th>Created At</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for dept in departments %}
+                <tr>
+                    <td>{{ dept.dept_id }}</td>
+                    <td><strong>{{ dept.dept_name }}</strong></td>
+                    <td><span class="badge badge-success">{{ dept.dept_code }}</span></td>
+                    <td>{{ dept.hod_name|default:"-" }}</td>
+                    <td>{{ dept.created_at|date:"M d, Y"|default:"-" }}</td>
+                    <td>
+                        <a href="{% url 'department_delete' dept.dept_id %}" 
+                           class="btn btn-danger" 
+                           onclick="return confirmDelete('Delete department: {{ dept.dept_name }}?')">
+                            🗑️ Delete
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon">🏢</div>
+            <p>No departments found.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

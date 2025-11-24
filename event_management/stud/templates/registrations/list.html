@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block title %}Registrations{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>📝 Registrations Management</h1>
+    <a href="{% url 'registration_create' %}" class="btn btn-primary">+ Add New Registration</a>
+</div>
+
+<div class="card">
+    {% if registrations %}
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Event</th>
+                    <th>Participant</th>
+                    <th>Registered At</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for reg in registrations %}
+                <tr>
+                    <td>{{ reg.reg_id }}</td>
+                    <td><strong>{{ reg.event.title }}</strong></td>
+                    <td>{{ reg.user.name }}</td>
+                    <td>{{ reg.registered_at|date:"M d, Y g:i A"|default:"-" }}</td>
+                    <td><span class="badge badge-success">{{ reg.status }}</span></td>
+                    <td>
+                        <a href="{% url 'registration_delete' reg.reg_id %}" 
+                           class="btn btn-danger" 
+                           onclick="return confirmDelete('Delete this registration?')">
+                            🗑️ Delete
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon">📝</div>
+            <p>No registrations found.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

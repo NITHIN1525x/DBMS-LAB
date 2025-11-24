@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}Resources{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>🔧 Resources Management</h1>
+    <a href="{% url 'resource_create' %}" class="btn btn-primary">+ Add New Resource</a>
+</div>
+
+<div class="card">
+    {% if resources %}
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Resource Name</th>
+                    <th>Total Quantity</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for resource in resources %}
+                <tr>
+                    <td>{{ resource.resource_id }}</td>
+                    <td><strong>{{ resource.resource_name }}</strong></td>
+                    <td><span class="badge badge-warning">{{ resource.total_quantity }} units</span></td>
+                    <td>
+                        <a href="{% url 'resource_delete' resource.resource_id %}" 
+                           class="btn btn-danger" 
+                           onclick="return confirmDelete('Delete resource: {{ resource.resource_name }}?')">
+                            🗑️ Delete
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon">🔧</div>
+            <p>No resources found.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

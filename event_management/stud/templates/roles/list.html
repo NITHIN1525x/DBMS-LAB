@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}Roles - Event Management System{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>👥 Roles Management</h1>
+    <a href="{% url 'role_create' %}" class="btn btn-primary">+ Add New Role</a>
+</div>
+
+<div class="card">
+    {% if roles %}
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Role Name</th>
+                    <th>Description</th>
+                    <th>Created At</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for role in roles %}
+                <tr>
+                    <td>{{ role.role_id }}</td>
+                    <td><strong>{{ role.role_name }}</strong></td>
+                    <td>{{ role.description|default:"-" }}</td>
+                    <td>{{ role.created_at|date:"M d, Y"|default:"-" }}</td>
+                    <td>
+                        <a href="{% url 'role_delete' role.role_id %}" 
+                           class="btn btn-danger" 
+                           onclick="return confirmDelete('Delete role: {{ role.role_name }}?')">
+                            🗑️ Delete
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon">👥</div>
+            <p>No roles found. Click "Add New Role" to create one.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

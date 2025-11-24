@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - Event Management System{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>📊 Dashboard Overview</h1>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card" style="border-left-color: #667eea;">
+        <h3>Total Events</h3>
+        <div class="number" style="color: #667eea;">{{ total_events }}</div>
+    </div>
+    <div class="stat-card" style="border-left-color: #10b981;">
+        <h3>Total Users</h3>
+        <div class="number" style="color: #10b981;">{{ total_users }}</div>
+    </div>
+    <div class="stat-card" style="border-left-color: #f59e0b;">
+        <h3>Total Venues</h3>
+        <div class="number" style="color: #f59e0b;">{{ total_venues }}</div>
+    </div>
+    <div class="stat-card" style="border-left-color: #ef4444;">
+        <h3>Registrations</h3>
+        <div class="number" style="color: #ef4444;">{{ total_registrations }}</div>
+    </div>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(500px, 1fr)); gap: 20px;">
+    <div class="card">
+        <h2 style="margin-bottom: 20px; color: #1f2937; display: flex; align-items: center; gap: 10px;">
+            🎉 Upcoming Events
+        </h2>
+        {% if upcoming_events %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Event Title</th>
+                        <th>Date & Time</th>
+                        <th>Venue</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for event in upcoming_events %}
+                    <tr>
+                        <td><strong>{{ event.title }}</strong></td>
+                        <td>{{ event.start_datetime|date:"M d, Y - g:i A" }}</td>
+                        <td>{{ event.venue.name|default:"-" }}</td>
+                        <td><span class="badge badge-success">{{ event.status }}</span></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <div class="empty-state">
+                <div class="empty-state-icon">📅</div>
+                <p>No upcoming events scheduled</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="card">
+        <h2 style="margin-bottom: 20px; color: #1f2937; display: flex; align-items: center; gap: 10px;">
+            📝 Recent Registrations
+        </h2>
+        {% if recent_registrations %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Participant</th>
+                        <th>Event</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for reg in recent_registrations %}
+                    <tr>
+                        <td>{{ reg.user.name }}</td>
+                        <td>{{ reg.event.title }}</td>
+                        <td><span class="badge badge-success">{{ reg.status }}</span></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <div class="empty-state">
+                <div class="empty-state-icon">👥</div>
+                <p>No recent registrations</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    // Add animation to stat cards
+    const statCards = document.querySelectorAll('.stat-card');
+    statCards.forEach((card, index) => {
+        card.style.animationDelay = `${index * 0.1}s`;
+    });
+</script>
+{% endblock %}

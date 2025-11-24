@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Event{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>➕ Add New Event</h1>
+</div>
+
+<div class="card" style="max-width: 900px; margin: 0 auto;">
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label>Event Title *</label>
+            <input type="text" name="title" required placeholder="e.g., ML Workshop">
+        </div>
+        
+        <div class="form-group">
+            <label>Description</label>
+            <textarea name="description" rows="4" placeholder="Detailed description of the event"></textarea>
+        </div>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px;">
+            <div class="form-group">
+                <label>Category</label>
+                <select name="category">
+                    <option value="">Select Category</option>
+                    {% for category in categories %}
+                    <option value="{{ category.category_id }}">{{ category.icon }} {{ category.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Organizer</label>
+                <select name="organizer">
+                    <option value="">Select Organizer</option>
+                    {% for user in users %}
+                    <option value="{{ user.user_id }}">{{ user.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Venue</label>
+                <select name="venue">
+                    <option value="">Select Venue</option>
+                    {% for venue in venues %}
+                    <option value="{{ venue.venue_id }}">{{ venue.name }} ({{ venue.capacity }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div class="form-group">
+                <label>Start Date & Time</label>
+                <input type="datetime-local" name="start_datetime">
+            </div>
+            
+            <div class="form-group">
+                <label>End Date & Time</label>
+                <input type="datetime-local" name="end_datetime">
+            </div>
+        </div>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div class="form-group">
+                <label>Capacity</label>
+                <input type="number" name="capacity" placeholder="Maximum attendees" min="1">
+            </div>
+            
+            <div class="form-group">
+                <label>Status</label>
+                <select name="status">
+                    <option value="scheduled">Scheduled</option>
+                    <option value="ongoing">Ongoing</option>
+                    <option value="completed">Completed</option>
+                    <option value="cancelled">Cancelled</option>
+                </select>
+            </div>
+        </div>
+        
+        <div style="display: flex; gap: 10px;">
+            <button type="submit" class="btn btn-primary">💾 Save Event</button>
+            <a href="{% url 'event_list' %}" class="btn" style="background: #e5e7eb; color: #374151;">❌ Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

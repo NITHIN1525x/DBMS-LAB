@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block title %}Events{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>🎉 Events Management</h1>
+    <a href="{% url 'event_create' %}" class="btn btn-primary">+ Add New Event</a>
+</div>
+
+<div class="card">
+    {% if events %}
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Event Title</th>
+                    <th>Category</th>
+                    <th>Organizer</th>
+                    <th>Venue</th>
+                    <th>Start Date</th>
+                    <th>Capacity</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for event in events %}
+                <tr>
+                    <td>{{ event.event_id }}</td>
+                    <td><strong>{{ event.title }}</strong></td>
+                    <td>{{ event.category.name|default:"-" }}</td>
+                    <td>{{ event.organizer.name|default:"-" }}</td>
+                    <td>{{ event.venue.name|default:"-" }}</td>
+                    <td>{{ event.start_datetime|date:"M d, Y g:i A"|default:"-" }}</td>
+                    <td><span class="badge badge-warning">{{ event.capacity|default:"0" }}</span></td>
+                    <td><span class="badge badge-success">{{ event.status }}</span></td>
+                    <td>
+                        <a href="{% url 'event_delete' event.event_id %}" 
+                           class="btn btn-danger" 
+                           onclick="return confirmDelete('Delete event: {{ event.title }}?')">
+                            🗑️ Delete
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon">🎉</div>
+            <p>No events found.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

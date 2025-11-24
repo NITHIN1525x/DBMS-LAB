@@ -1,0 +1,58 @@
+Event Management System — Abstract
+
+Overview:
+This Django-based Event Management System provides an administrative interface to create and manage events, users, venues, categories, resources, registrations and attendance. The application exposes a traditional web UI built with Django templates and server-side views, plus serializers indicating readiness for REST API endpoints. It focuses on organizing events (scheduling, capacity, venue assignment), managing participants and staff (roles and departments), and tracking registrations and attendance.
+
+Core Data Models:
+- Role: user roles with name and description.
+- Department: organizational units (dept name, code, HOD).
+- User: participants and staff (name, roll_no, contact, role, department).
+- Venue: physical locations with capacity and location info.
+- Category: event categories and metadata (icon, active flag).
+- Event: event details (title, description, category, organizer, venue, start/end, capacity, status).
+- Registration: links users to events (unique per event-user), with status and timestamp.
+- Attendance: per-event user attendance flag and timestamp.
+- Resource: generic resources/equipment and quantity tracking.
+- EventResource: resources allocated to events (quantity per event).
+
+Primary Functionality / Pages:
+- Dashboard: overview stats (total events, users, venues, registrations), upcoming events, recent registrations.
+- CRUD pages for: Roles, Departments, Users, Venues, Categories, Events, Registrations, Attendance, Resources, Event Resources.
+- Users list and creation flows; deletion actions available for most resources.
+- Forms for creating/updating records and tables for listing items.
+
+API / Integration:
+- `serializers.py` defines ModelSerializers for all core models, indicating an API layer (DRF) is set up or planned.
+- Views are currently server-rendered; serializers enable adding REST endpoints or mobile/web API clients.
+
+User Flows:
+- Admin creates roles, departments, venues, categories and resources.
+- Admin or organizer creates events and assigns venue, category and organizer.
+- Users are created and can be registered to events; registrations are recorded with status.
+- Attendance can be marked per event; event resources map resource requirements to events.
+
+UI & Styling:
+- Templates are organized under `stud/templates/` with a polished base layout and responsive styles; dashboard and table-driven list pages are included.
+- Visual emphasis on cards, stat widgets, and readable tables. Confirmation prompts are used for destructive actions (delete).
+
+Technical Notes:
+- Built with Django (server-side rendered templates) and Django REST Framework serializers.
+- Models are `managed = False` (likely reflecting an existing database schema / legacy DB).
+- Views use simple function-based views and Django messages for feedback; queries use select_related and basic filters for performance.
+
+Suggested Next Steps / Recommendations:
+- Add REST viewsets + routers to expose CRUD endpoints using existing serializers if API access is needed.
+- Implement authentication/authorization (Django auth or custom) and protect admin operations by role.
+- Add input validation and CSRF-safe forms where missing; consider password hashing/management for users.
+- Add unit tests for critical flows (event creation, registration uniqueness, attendance marking).
+- Consider enabling migrations (`managed = True`) if you plan to manage schema from Django directly — or keep as-is if you depend on an external DB schema.
+
+File location:
+`WEBSITE_ABSTRACT.txt` created at repository root: `C:\Users\nniti\OneDrive\Desktop\DBMS-CH\WEBSITE_ABSTRACT.txt`
+
+If you want, I can:
+- Expand this into a README.md with setup and run instructions.
+- Generate a REST API spec (OpenAPI) from the serializers and views.
+- Create or update a `requirements.txt` or Dockerfile for deployment.
+
+Tell me which next action you'd like.

@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}Users{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>👤 Users Management</h1>
+    <a href="{% url 'user_create' %}" class="btn btn-primary">+ Add New User</a>
+</div>
+
+<div class="card">
+    {% if users %}
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Roll No</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Role</th>
+                    <th>Department</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <td>{{ user.user_id }}</td>
+                    <td><strong>{{ user.name }}</strong></td>
+                    <td>{{ user.roll_no|default:"-" }}</td>
+                    <td>{{ user.email|default:"-" }}</td>
+                    <td>{{ user.phone|default:"-" }}</td>
+                    <td><span class="badge badge-success">{{ user.role.role_name|default:"-" }}</span></td>
+                    <td>{{ user.dept.dept_name|default:"-" }}</td>
+                    <td>
+                        <a href="{% url 'user_delete' user.user_id %}" 
+                           class="btn btn-danger" 
+                           onclick="return confirmDelete('Delete user: {{ user.name }}?')">
+                            🗑️ Delete
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon">👤</div>
+            <p>No users found.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

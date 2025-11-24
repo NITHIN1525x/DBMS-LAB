@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block title %}Categories{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>🏷️ Categories Management</h1>
+    <a href="{% url 'category_create' %}" class="btn btn-primary">+ Add New Category</a>
+</div>
+
+<div class="card">
+    {% if categories %}
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Icon</th>
+                    <th>Category Name</th>
+                    <th>Description</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for category in categories %}
+                <tr>
+                    <td>{{ category.category_id }}</td>
+                    <td style="font-size: 24px;">{{ category.icon|default:"📁" }}</td>
+                    <td><strong>{{ category.name }}</strong></td>
+                    <td>{{ category.description|default:"-" }}</td>
+                    <td>
+                        {% if category.active_status %}
+                            <span class="badge badge-success">Active</span>
+                        {% else %}
+                            <span class="badge badge-danger">Inactive</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{% url 'category_delete' category.category_id %}" 
+                           class="btn btn-danger" 
+                           onclick="return confirmDelete('Delete category: {{ category.name }}?')">
+                            🗑️ Delete
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon">🏷️</div>
+            <p>No categories found.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

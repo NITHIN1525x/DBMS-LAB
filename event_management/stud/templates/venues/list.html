@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}Venues{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>📍 Venues Management</h1>
+    <a href="{% url 'venue_create' %}" class="btn btn-primary">+ Add New Venue</a>
+</div>
+
+<div class="card">
+    {% if venues %}
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Venue Name</th>
+                    <th>Location</th>
+                    <th>Capacity</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for venue in venues %}
+                <tr>
+                    <td>{{ venue.venue_id }}</td>
+                    <td><strong>{{ venue.name }}</strong></td>
+                    <td>{{ venue.location|default:"-" }}</td>
+                    <td><span class="badge badge-warning">{{ venue.capacity }} persons</span></td>
+                    <td>
+                        <a href="{% url 'venue_delete' venue.venue_id %}" 
+                           class="btn btn-danger" 
+                           onclick="return confirmDelete('Delete venue: {{ venue.name }}?')">
+                            🗑️ Delete
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon">📍</div>
+            <p>No venues found.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block title %}Attendance{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>✅ Attendance Management</h1>
+    <a href="{% url 'attendance_create' %}" class="btn btn-primary">+ Mark Attendance</a>
+</div>
+
+<div class="card">
+    {% if attendances %}
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Event</th>
+                    <th>Participant</th>
+                    <th>Present</th>
+                    <th>Checked At</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for att in attendances %}
+                <tr>
+                    <td>{{ att.attendance_id }}</td>
+                    <td><strong>{{ att.event.title }}</strong></td>
+                    <td>{{ att.user.name }}</td>
+                    <td>
+                        {% if att.present %}
+                            <span class="badge badge-success">✓ Present</span>
+                        {% else %}
+                            <span class="badge badge-danger">✗ Absent</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ att.checked_at|date:"M d, Y g:i A"|default:"-" }}</td>
+                    <td>
+                        <a href="{% url 'attendance_delete' att.attendance_id %}" 
+                           class="btn btn-danger" 
+                           onclick="return confirmDelete('Delete this attendance record?')">
+                            🗑️ Delete
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon">✅</div>
+            <p>No attendance records found.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

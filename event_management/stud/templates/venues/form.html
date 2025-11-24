@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Venue{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>➕ Add New Venue</h1>
+</div>
+
+<div class="card" style="max-width: 700px; margin: 0 auto;">
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label>Venue Name *</label>
+            <input type="text" name="name" required placeholder="e.g., Main Auditorium">
+        </div>
+        
+        <div class="form-group">
+            <label>Location</label>
+            <input type="text" name="location" placeholder="e.g., Building A, Floor 2">
+        </div>
+        
+        <div class="form-group">
+            <label>Capacity *</label>
+            <input type="number" name="capacity" required placeholder="Maximum number of people" min="1">
+        </div>
+        
+        <div style="display: flex; gap: 10px;">
+            <button type="submit" class="btn btn-primary">💾 Save Venue</button>
+            <a href="{% url 'venue_list' %}" class="btn" style="background: #e5e7eb; color: #374151;">❌ Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
