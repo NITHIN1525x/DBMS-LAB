@@ -34,6 +34,7 @@ urlpatterns = [
     path('events/', views.event_list, name='event_list'),
     path('events/create/', views.event_create, name='event_create'),
     path('events/delete/<int:pk>/', views.event_delete, name='event_delete'),
+    path('events/summary/', views.event_summary, name='event_summary'),
     
     # Registrations
     path('registrations/', views.registration_list, name='registration_list'),
@@ -44,6 +45,7 @@ urlpatterns = [
     path('attendance/', views.attendance_list, name='attendance_list'),
     path('attendance/create/', views.attendance_create, name='attendance_create'),
     path('attendance/delete/<int:pk>/', views.attendance_delete, name='attendance_delete'),
+    path('attendance/event/<int:event_id>/', views.attendance_by_event, name='attendance_by_event'),
     
     # Resources
     path('resources/', views.resource_list, name='resource_list'),

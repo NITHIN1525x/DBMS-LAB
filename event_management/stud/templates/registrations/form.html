@@ -8,6 +8,12 @@
 </div>
 
 <div class="card" style="max-width: 700px; margin: 0 auto;">
+    <p style="color: #6b7280; margin-bottom: 20px; padding: 15px; background: #f0f9ff; border-radius: 8px; border-left: 4px solid #3b82f6;">
+        <strong>💡 Protected by Triggers & Stored Procedure:</strong> This registration uses <code>sp_register_user_for_event</code> 
+        stored procedure with capacity validation. The trigger <code>trg_before_registration_insert</code> ensures event 
+        capacity is not exceeded, and <code>trg_after_registration_insert</code> automatically creates an attendance record.
+    </p>
+    
     <form method="post">
         {% csrf_token %}
         
@@ -16,7 +22,7 @@
             <select name="event" required>
                 <option value="">Select Event</option>
                 {% for event in events %}
-                <option value="{{ event.event_id }}">{{ event.title }}</option>
+                <option value="{{ event.event_id }}">{{ event.title }} (Capacity: {{ event.capacity }})</option>
                 {% endfor %}
             </select>
         </div>
@@ -26,22 +32,13 @@
             <select name="user" required>
                 <option value="">Select User</option>
                 {% for user in users %}
-                <option value="{{ user.user_id }}">{{ user.name }} {% if user.roll_no %}({{ user.roll_no }}){% endif %}</option>
+                <option value="{{ user.user_id }}">{{ user.name }} ({{ user.roll_no|default:"No Roll" }})</option>
                 {% endfor %}
             </select>
         </div>
         
-        <div class="form-group">
-            <label>Status</label>
-            <select name="status">
-                <option value="confirmed">Confirmed</option>
-                <option value="pending">Pending</option>
-                <option value="cancelled">Cancelled</option>
-            </select>
-        </div>
-        
         <div style="display: flex; gap: 10px;">
-            <button type="submit" class="btn btn-primary">💾 Save Registration</button>
+            <button type="submit" class="btn btn-primary">💾 Register User</button>
             <a href="{% url 'registration_list' %}" class="btn" style="background: #e5e7eb; color: #374151;">❌ Cancel</a>
         </div>
     </form>

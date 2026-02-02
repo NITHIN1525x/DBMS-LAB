@@ -5,10 +5,17 @@
 {% block content %}
 <div class="page-header">
     <h1>🎉 Events Management</h1>
-    <a href="{% url 'event_create' %}" class="btn btn-primary">+ Add New Event</a>
+    <div style="display: flex; gap: 10px;">
+        <a href="{% url 'event_summary' %}" class="btn btn-success">📊 View Summary</a>
+        <a href="{% url 'event_create' %}" class="btn btn-primary">+ Add New Event</a>
+    </div>
 </div>
 
 <div class="card">
+    <p style="color: #6b7280; margin-bottom: 20px;">
+        <strong>📌 Note:</strong> Event details are displayed from <code>vw_event_details</code> view with joined information.
+    </p>
+    
     {% if events %}
         <table>
             <thead>
@@ -16,8 +23,9 @@
                     <th>ID</th>
                     <th>Event Title</th>
                     <th>Category</th>
+                    <th>Venue & Location</th>
                     <th>Organizer</th>
-                    <th>Venue</th>
+                    <th>Department</th>
                     <th>Start Date</th>
                     <th>Capacity</th>
                     <th>Status</th>
@@ -29,9 +37,13 @@
                 <tr>
                     <td>{{ event.event_id }}</td>
                     <td><strong>{{ event.title }}</strong></td>
-                    <td>{{ event.category.name|default:"-" }}</td>
-                    <td>{{ event.organizer.name|default:"-" }}</td>
-                    <td>{{ event.venue.name|default:"-" }}</td>
+                    <td>{{ event.category_name|default:"-" }}</td>
+                    <td>
+                        <strong>{{ event.venue_name|default:"-" }}</strong><br>
+                        <small style="color: #6b7280;">{{ event.venue_location|default:"" }}</small>
+                    </td>
+                    <td>{{ event.organizer_name|default:"-" }}</td>
+                    <td>{{ event.organizer_department|default:"-" }}</td>
                     <td>{{ event.start_datetime|date:"M d, Y g:i A"|default:"-" }}</td>
                     <td><span class="badge badge-warning">{{ event.capacity|default:"0" }}</span></td>
                     <td><span class="badge badge-success">{{ event.status }}</span></td>

@@ -1,5 +1,4 @@
-from django.db import models
-
+from django.db import models, connection
 
 class Role(models.Model):
     role_id = models.AutoField(primary_key=True)
@@ -156,3 +155,83 @@ class EventResource(models.Model):
     class Meta:
         managed = False
         db_table = 'event_resources'
+
+
+# ============================================================
+# VIEWS - Read-only models for database views
+# ============================================================
+
+class EventDetailsView(models.Model):
+    """View: vw_event_details"""
+    event_id = models.IntegerField(primary_key=True)
+    title = models.CharField(max_length=255)
+    description = models.TextField(blank=True, null=True)
+    start_datetime = models.DateTimeField(blank=True, null=True)
+    end_datetime = models.DateTimeField(blank=True, null=True)
+    status = models.CharField(max_length=20, blank=True, null=True)
+    capacity = models.IntegerField(blank=True, null=True)
+    category_name = models.CharField(max_length=80, blank=True, null=True)
+    venue_name = models.CharField(max_length=150, blank=True, null=True)
+    venue_location = models.CharField(max_length=255, blank=True, null=True)
+    organizer_name = models.CharField(max_length=200, blank=True, null=True)
+    organizer_department = models.CharField(max_length=150, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'vw_event_details'
+
+
+class UserRegistrationsView(models.Model):
+    """View: vw_user_registrations"""
+    reg_id = models.IntegerField(primary_key=True)
+    user_id = models.IntegerField()
+    user_name = models.CharField(max_length=200)
+    roll_no = models.CharField(max_length=20, blank=True, null=True)
+    email = models.CharField(max_length=200, blank=True, null=True)
+    event_id = models.IntegerField()
+    event_title = models.CharField(max_length=255)
+    start_datetime = models.DateTimeField(blank=True, null=True)
+    end_datetime = models.DateTimeField(blank=True, null=True)
+    registration_status = models.CharField(max_length=20, blank=True, null=True)
+    registered_at = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'vw_user_registrations'
+
+
+class EventRegistrationSummaryView(models.Model):
+    """View: vw_event_registration_summary"""
+    event_id = models.IntegerField(primary_key=True)
+    title = models.CharField(max_length=255)
+    capacity = models.IntegerField(blank=True, null=True)
+    total_registrations = models.IntegerField()
+    remaining_seats = models.IntegerField()
+
+    class Meta:
+        managed = False
+        db_table = 'vw_event_registration_summary'
+
+
+# ============================================================
+# STORED PROCEDURES - Helper functions to call procedures
+# ============================================================
+
+def call_register_user_for_event(event_id, user_id):
+    """Call stored procedure: sp_register_user_for_event"""
+    with connection.cursor() as cursor:
+        try:
+            cursor.callproc('sp_register_user_for_event', [event_id, user_id])
+            return {'success': True, 'message': 'User registered successfully'}
+        except Exception as e:
+            return {'success': False, 'message': str(e)}
+
+
+def call_mark_attendance(event_id, user_id, present):
+    """Call stored procedure: sp_mark_attendance"""
+    with connection.cursor() as cursor:
+        try:
+            cursor.callproc('sp_mark_attendance', [event_id, user_id, present])
+            return {'success': True, 'message': 'Attendance marked successfully'}
+        except Exception as e:
+            return {'success': False, 'message': str(e)}

@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block title %}Event Summary{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>📊 Event Registration Summary</h1>
+    <a href="{% url 'dashboard' %}" class="btn" style="background: #e5e7eb; color: #374151;">← Back to Dashboard</a>
+</div>
+
+<div class="card">
+    <p style="color: #6b7280; margin-bottom: 20px;">
+        <strong>📌 Note:</strong> This data is pulled from the <code>vw_event_registration_summary</code> database view, 
+        which automatically calculates registrations and remaining seats.
+    </p>
+    
+    {% if summaries %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Event ID</th>
+                    <th>Event Title</th>
+                    <th>Total Capacity</th>
+                    <th>Total Registrations</th>
+                    <th>Remaining Seats</th>
+                    <th>Fill Rate</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for summary in summaries %}
+                <tr>
+                    <td>{{ summary.event_id }}</td>
+                    <td><strong>{{ summary.title }}</strong></td>
+                    <td>{{ summary.capacity }}</td>
+                    <td><span class="badge badge-success">{{ summary.total_registrations }}</span></td>
+                    <td>
+                        {% if summary.remaining_seats > 0 %}
+                            <span class="badge badge-warning">{{ summary.remaining_seats }}</span>
+                        {% else %}
+                            <span class="badge badge-danger">0 (FULL)</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div style="background: #e5e7eb; border-radius: 10px; height: 20px; overflow: hidden;">
+                            <div style="background: linear-gradient(90deg, #10b981, #059669); height: 100%; width: {% widthratio summary.total_registrations summary.capacity 100 %}%; transition: width 0.5s;"></div>
+                        </div>
+                        <span style="font-size: 12px; color: #6b7280;">{% widthratio summary.total_registrations summary.capacity 100 %}%</span>
+                    </td>
+                    <td>
+                        {% if summary.remaining_seats == 0 %}
+                            <span class="badge badge-danger">🔴 Full</span>
+                        {% elif summary.remaining_seats < 10 %}
+                            <span class="badge badge-warning">🟡 Almost Full</span>
+                        {% else %}
+                            <span class="badge badge-success">🟢 Available</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon">📊</div>
+            <p>No event summary data available</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -79,7 +79,7 @@ WSGI_APPLICATION = 'event_management.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'eventmgmt',
+        'NAME': 'em',
         'USER': 'root',
         'PASSWORD': 'nithin',
         'HOST': 'localhost',
@@ -135,3 +135,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:3000",
 ]
 
+DEBUG = False
+
+STATIC_URL = "/static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"

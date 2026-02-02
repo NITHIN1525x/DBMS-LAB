@@ -9,13 +9,21 @@
 </div>
 
 <div class="card">
+    <p style="color: #6b7280; margin-bottom: 20px;">
+        <strong>📌 Note:</strong> Registration data is displayed from <code>vw_user_registrations</code> view. 
+        New registrations use the <code>sp_register_user_for_event</code> stored procedure with capacity checks (trigger protection).
+    </p>
+    
     {% if registrations %}
         <table>
             <thead>
                 <tr>
                     <th>ID</th>
-                    <th>Event</th>
                     <th>Participant</th>
+                    <th>Roll No</th>
+                    <th>Email</th>
+                    <th>Event</th>
+                    <th>Event Date</th>
                     <th>Registered At</th>
                     <th>Status</th>
                     <th>Actions</th>
@@ -25,10 +33,13 @@
                 {% for reg in registrations %}
                 <tr>
                     <td>{{ reg.reg_id }}</td>
-                    <td><strong>{{ reg.event.title }}</strong></td>
-                    <td>{{ reg.user.name }}</td>
+                    <td><strong>{{ reg.user_name }}</strong></td>
+                    <td>{{ reg.roll_no|default:"-" }}</td>
+                    <td>{{ reg.email|default:"-" }}</td>
+                    <td><strong>{{ reg.event_title }}</strong></td>
+                    <td>{{ reg.start_datetime|date:"M d, Y"|default:"-" }}</td>
                     <td>{{ reg.registered_at|date:"M d, Y g:i A"|default:"-" }}</td>
-                    <td><span class="badge badge-success">{{ reg.status }}</span></td>
+                    <td><span class="badge badge-success">{{ reg.registration_status }}</span></td>
                     <td>
                         <a href="{% url 'registration_delete' reg.reg_id %}" 
                            class="btn btn-danger" 

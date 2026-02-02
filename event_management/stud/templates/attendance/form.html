@@ -8,6 +8,11 @@
 </div>
 
 <div class="card" style="max-width: 700px; margin: 0 auto;">
+    <p style="color: #6b7280; margin-bottom: 20px; padding: 15px; background: #f0f9ff; border-radius: 8px; border-left: 4px solid #3b82f6;">
+        <strong>💡 Using Stored Procedure:</strong> This form uses <code>sp_mark_attendance</code> stored procedure 
+        which automatically handles insert/update logic for attendance records.
+    </p>
+    
     <form method="post">
         {% csrf_token %}
         
@@ -26,15 +31,15 @@
             <select name="user" required>
                 <option value="">Select User</option>
                 {% for user in users %}
-                <option value="{{ user.user_id }}">{{ user.name }} {% if user.roll_no %}({{ user.roll_no }}){% endif %}</option>
+                <option value="{{ user.user_id }}">{{ user.name }} ({{ user.roll_no|default:"No Roll" }})</option>
                 {% endfor %}
             </select>
         </div>
         
         <div class="form-group">
             <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
-                <input type="checkbox" name="present" checked style="width: auto; height: 20px;">
-                <span style="font-size: 16px;">Mark as Present</span>
+                <input type="checkbox" name="present" checked style="width: auto;">
+                Mark as Present
             </label>
         </div>
         

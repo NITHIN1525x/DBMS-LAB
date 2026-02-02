@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block title %}Attendance for {{ event.title }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>✅ Attendance: {{ event.title }}</h1>
+    <a href="{% url 'attendance_list' %}" class="btn" style="background: #e5e7eb; color: #374151;">← Back</a>
+</div>
+
+<div class="stats-grid" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 20px;">
+    <div class="stat-card" style="border-left-color: #10b981;">
+        <h3>Present</h3>
+        <div class="number" style="color: #10b981;">{{ present_count }}</div>
+    </div>
+    <div class="stat-card" style="border-left-color: #ef4444;">
+        <h3>Absent</h3>
+        <div class="number" style="color: #ef4444;">{{ absent_count }}</div>
+    </div>
+    <div class="stat-card" style="border-left-color: #667eea;">
+        <h3>Total</h3>
+        <div class="number" style="color: #667eea;">{{ attendances.count }}</div>
+    </div>
+</div>
+
+<div class="card">
+    {% if attendances %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Participant</th>
+                    <th>Roll No</th>
+                    <th>Status</th>
+                    <th>Checked At</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for att in attendances %}
+                <tr>
+                    <td><strong>{{ att.user.name }}</strong></td>
+                    <td>{{ att.user.roll_no|default:"-" }}</td>
+                    <td>
+                        {% if att.present %}
+                            <span class="badge badge-success">✓ Present</span>
+                        {% else %}
+                            <span class="badge badge-danger">✗ Absent</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ att.checked_at|date:"M d, Y g:i A"|default:"-" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon">✅</div>
+            <p>No attendance records for this event</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

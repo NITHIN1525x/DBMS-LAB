@@ -4,20 +4,29 @@ from django.db.models import Count, Q
 from datetime import datetime
 from .models import (
     Role, Department, User, Venue, Category,
-    Event, Registration, Attendance, Resource, EventResource
+    Event, Registration, Attendance, Resource, EventResource,
+    EventDetailsView, UserRegistrationsView, EventRegistrationSummaryView,
+    call_register_user_for_event, call_mark_attendance
 )
 
-# Dashboard View
+# Dashboard View - Using Views
 def dashboard(request):
+    # Using database views for better performance
+    event_summaries = EventRegistrationSummaryView.objects.all()
+    event_details = EventDetailsView.objects.filter(
+        start_datetime__gte=datetime.now()
+    ).order_by('start_datetime')[:5]
+    
+    recent_registrations = UserRegistrationsView.objects.order_by('-registered_at')[:5]
+    
     context = {
         'total_events': Event.objects.count(),
         'total_users': User.objects.count(),
         'total_venues': Venue.objects.count(),
         'total_registrations': Registration.objects.count(),
-        'upcoming_events': Event.objects.filter(
-            start_datetime__gte=datetime.now()
-        ).order_by('start_datetime')[:5],
-        'recent_registrations': Registration.objects.order_by('-registered_at')[:5],
+        'upcoming_events': event_details,
+        'recent_registrations': recent_registrations,
+        'event_summaries': event_summaries[:5],
     }
     return render(request, 'dashboard.html', context)
 
@@ -78,8 +87,8 @@ def user_create(request):
             roll_no=request.POST.get('roll_no', ''),
             email=request.POST.get('email', ''),
             phone=request.POST.get('phone', ''),
-            role_id=request.POST.get('role'),
-            dept_id=request.POST.get('dept'),
+            role_id=request.POST.get('role') or None,
+            dept_id=request.POST.get('dept') or None,
             created_at=datetime.now()
         )
         messages.success(request, 'User created successfully!')
@@ -143,9 +152,10 @@ def category_delete(request, pk):
     messages.success(request, 'Category deleted successfully!')
     return redirect('category_list')
 
-# Event Views
+# Event Views - Using EventDetailsView
 def event_list(request):
-    events = Event.objects.all().select_related('category', 'organizer', 'venue')
+    # Use the view for better display
+    events = EventDetailsView.objects.all()
     return render(request, 'events/list.html', {'events': events})
 
 def event_create(request):
@@ -153,12 +163,12 @@ def event_create(request):
         event = Event.objects.create(
             title=request.POST['title'],
             description=request.POST.get('description', ''),
-            category_id=request.POST.get('category'),
-            organizer_id=request.POST.get('organizer'),
-            venue_id=request.POST.get('venue'),
-            start_datetime=request.POST.get('start_datetime'),
-            end_datetime=request.POST.get('end_datetime'),
-            capacity=request.POST.get('capacity'),
+            category_id=request.POST.get('category') or None,
+            organizer_id=request.POST.get('organizer') or None,
+            venue_id=request.POST.get('venue') or None,
+            start_datetime=request.POST.get('start_datetime') or None,
+            end_datetime=request.POST.get('end_datetime') or None,
+            capacity=request.POST.get('capacity') or None,
             status=request.POST.get('status', 'scheduled'),
             created_at=datetime.now()
         )
@@ -180,21 +190,30 @@ def event_delete(request, pk):
     messages.success(request, 'Event deleted successfully!')
     return redirect('event_list')
 
-# Registration Views
+def event_summary(request):
+    """View event registration summary"""
+    summaries = EventRegistrationSummaryView.objects.all()
+    return render(request, 'events/summary.html', {'summaries': summaries})
+
+# Registration Views - Using Stored Procedure
 def registration_list(request):
-    registrations = Registration.objects.all().select_related('event', 'user')
+    # Use the view for better display
+    registrations = UserRegistrationsView.objects.all()
     return render(request, 'registrations/list.html', {'registrations': registrations})
 
 def registration_create(request):
     if request.method == 'POST':
-        registration = Registration.objects.create(
-            event_id=request.POST['event'],
-            user_id=request.POST['user'],
-            registered_at=datetime.now(),
-            status=request.POST.get('status', 'confirmed')
-        )
-        messages.success(request, 'Registration created successfully!')
-        return redirect('registration_list')
+        event_id = request.POST.get('event')
+        user_id = request.POST.get('user')
+        
+        # Call stored procedure for registration
+        result = call_register_user_for_event(event_id, user_id)
+        
+        if result['success']:
+            messages.success(request, result['message'])
+            return redirect('registration_list')
+        else:
+            messages.error(request, f"Registration failed: {result['message']}")
     
     events = Event.objects.all()
     users = User.objects.all()
@@ -209,21 +228,25 @@ def registration_delete(request, pk):
     messages.success(request, 'Registration deleted successfully!')
     return redirect('registration_list')
 
-# Attendance Views
+# Attendance Views - Using Stored Procedure
 def attendance_list(request):
     attendances = Attendance.objects.all().select_related('event', 'user')
     return render(request, 'attendance/list.html', {'attendances': attendances})
 
 def attendance_create(request):
     if request.method == 'POST':
-        attendance = Attendance.objects.create(
-            event_id=request.POST['event'],
-            user_id=request.POST['user'],
-            present=request.POST.get('present') == 'on',
-            checked_at=datetime.now()
-        )
-        messages.success(request, 'Attendance marked successfully!')
-        return redirect('attendance_list')
+        event_id = request.POST.get('event')
+        user_id = request.POST.get('user')
+        present = request.POST.get('present') == 'on'
+        
+        # Call stored procedure for marking attendance
+        result = call_mark_attendance(event_id, user_id, present)
+        
+        if result['success']:
+            messages.success(request, result['message'])
+            return redirect('attendance_list')
+        else:
+            messages.error(request, f"Attendance marking failed: {result['message']}")
     
     events = Event.objects.all()
     users = User.objects.all()
@@ -237,6 +260,22 @@ def attendance_delete(request, pk):
     attendance.delete()
     messages.success(request, 'Attendance deleted successfully!')
     return redirect('attendance_list')
+
+def attendance_by_event(request, event_id):
+    """View attendance for a specific event"""
+    event = get_object_or_404(Event, event_id=event_id)
+    attendances = Attendance.objects.filter(event=event).select_related('user')
+    
+    present_count = attendances.filter(present=True).count()
+    absent_count = attendances.filter(present=False).count()
+    
+    context = {
+        'event': event,
+        'attendances': attendances,
+        'present_count': present_count,
+        'absent_count': absent_count,
+    }
+    return render(request, 'attendance/by_event.html', context)
 
 # Resource Views
 def resource_list(request):
@@ -271,7 +310,7 @@ def event_resource_create(request):
             resource_id=request.POST['resource'],
             quantity_required=request.POST['quantity_required']
         )
-        messages.success(request, 'Event Resource created successfully!')
+        messages.success(request, 'Event Resource allocated successfully!')
         return redirect('event_resource_list')
     
     events = Event.objects.all()
