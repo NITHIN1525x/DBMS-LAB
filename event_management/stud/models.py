@@ -10,7 +10,7 @@ class Role(models.Model):
         return self.role_name
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'roles'
 
 
@@ -25,7 +25,7 @@ class Department(models.Model):
         return self.dept_name
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'departments'
 
 
@@ -44,7 +44,7 @@ class User(models.Model):
         return self.name
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'users'
 
 
@@ -58,7 +58,7 @@ class Venue(models.Model):
         return self.name
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'venues'
 
 
@@ -73,7 +73,7 @@ class Category(models.Model):
         return self.name
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'categories'
 
 
@@ -94,7 +94,7 @@ class Event(models.Model):
         return self.title
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'events'
 
 
@@ -109,7 +109,7 @@ class Registration(models.Model):
         return f"{self.user} -> {self.event}"
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'registrations'
         unique_together = (('event', 'user'),)
 
@@ -125,7 +125,7 @@ class Attendance(models.Model):
         return f"{self.user} @ {self.event}: {self.present}"
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'attendance'
         unique_together = (('event', 'user'),)
 
@@ -139,7 +139,7 @@ class Resource(models.Model):
         return self.resource_name
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'resources'
 
 
@@ -153,7 +153,7 @@ class EventResource(models.Model):
         return f"{self.event} uses {self.resource} x{self.quantity_required}"
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'event_resources'
 
 
