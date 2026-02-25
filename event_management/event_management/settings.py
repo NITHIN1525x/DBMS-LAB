@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+import os
+from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,12 +22,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-*dl#5z_2=i!v$9o-c#a#mn7i^4t1fjn(7xs1zk(i@9_t-cbqu8'
+SECRET_KEY = config('SECRET_KEY', default='django-insecure-*dl#5z_2=i!v$9o-c#a#mn7i^4t1fjn(7xs1zk(i@9_t-cbqu8')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config('DEBUG', default=True, cast=bool)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='127.0.0.1,localhost', cast=lambda v: [s.strip() for s in v.split(',')])
 
 
 # Application definition
@@ -44,6 +46,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # WhiteNoise for static files
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware', 
     'django.middleware.common.CommonMiddleware',
@@ -76,16 +79,30 @@ WSGI_APPLICATION = 'event_management.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'em',
-        'USER': 'root',
-        'PASSWORD': 'nithin',
-        'HOST': 'localhost',
-        'PORT': '3306',
-    },
-}
+# For production with PostgreSQL on Render
+DATABASE_URL = config('DATABASE_URL', default=None)
+
+if DATABASE_URL:
+    import dj_database_url
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=DATABASE_URL,
+            conn_max_age=600,
+            conn_health_checks=True,
+        )
+    }
+else:
+    # Local MySQL configuration for development
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': 'em',
+            'USER': 'root',
+            'PASSWORD': 'nithin',
+            'HOST': 'localhost',
+            'PORT': '3306',
+        },
+    }
 
 
 # Password validation
@@ -122,20 +139,25 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-
+# CORS Configuration
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",  # Your frontend URL
+    "http://localhost:3000",
     "http://127.0.0.1:3000",
+    config('FRONTEND_URL', default='http://localhost:3000'),
 ]
 
-DEBUG = False
+# CSRF Configuration for production
+CSRF_TRUSTED_ORIGINS = [
+    config('FRONTEND_URL', default='http://localhost:3000'),
+]
 
-STATIC_URL = "/static/"
-STATIC_ROOT = BASE_DIR / "staticfiles"
+# WhiteNoise caching headers
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'

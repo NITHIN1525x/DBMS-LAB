@@ -1,4 +1,14 @@
 venv/
 __pycache__/
 *.pyc
-
+.env
+.env.local
+.DS_Store
+*.egg-info/
+dist/
+build/
+.vscode/
+.idea/
+*.log
+db.sqlite3
+staticfiles/
